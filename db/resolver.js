@@ -1,5 +1,6 @@
 // --- Importamos el Modelo y más importaciones
 const Usuario = require("../models/Usuario");
+const Producto = require("../models/Producto");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -14,10 +15,30 @@ const crearToken = (usuario, secret, expiresIn) => {
 // --- RESOLVERS ---
 const resolvers = {
    Query: {
+      // Usuarios:
       obtenerUsuario: async (_, { token }) => {
          const usuarioId = await jwt.verify(token, process.env.SECRET);
 
          return usuarioId;
+      },
+
+      // Productos (lesson 34)
+      obtenerProductos: async () => {
+         try {
+            const productos = await Producto.find({});
+            return productos;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+      obtenerProducto: async (_, { id }) => {
+         // revisar si el producto con el id existe en la DB:
+         const producto = await Producto.findById(id);
+
+         if (!producto) {
+            throw new Error("Producto no encontrado (err:p1)");
+         }
+         return producto;
       },
    },
 
@@ -65,6 +86,47 @@ const resolvers = {
          return {
             token: crearToken(existeUsuario, process.env.SECRET, "24h"),
          };
+      },
+
+      // Para productos: (lesson 33)
+      nuevoProducto: async (_, { input }) => {
+         try {
+            const producto = new Producto(input);
+
+            // Guadar en la DB:
+            const resultado = await producto.save();
+
+            return resultado;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+      // Actualizar producto: (lesson 36) del schema, definimos los inputs:
+      actualizarProducto: async (_, { id, input }) => {
+         // revisar si el producto existe en la db
+         let producto = await Producto.findById(id);
+
+         if (!producto) {
+            throw new Error("Producto no encontrado (err:p1");
+         }
+
+         //guardar el producto actualizado
+         producto = await Producto.findOneAndUpdate({ _id: id }, input, { new: true });
+
+         return producto;
+      },
+      // Eliminar producto: (lesson 37)
+      eliminarProducto: async (_, { id }) => {
+         // revisar si el producto existe en la db
+         let producto = await Producto.findById(id);
+
+         if (!producto) {
+            throw new Error("Producto no encontrado (err:p1");
+         }
+
+         //Eliminar:
+         await Producto.findOneAndDelete({ _id: id });
+         return "Producto eliminado";
       },
    },
 };
