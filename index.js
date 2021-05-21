@@ -1,6 +1,7 @@
 require("dotenv").config();
 // --- IMPORTACIONES ---
 const { ApolloServer } = require("apollo-server");
+const jwt = require("jsonwebtoken");
 const typeDefs = require("./db/schema");
 const resolvers = require("./db/resolver");
 
@@ -13,6 +14,20 @@ conectarDB();
 const server = new ApolloServer({
    typeDefs,
    resolvers,
+   // Lesson 41: usando context para asignarle el vendedor al cliente:
+   context: ({ req }) => {
+      const token = req.headers["authorization"] || "";
+      if (token) {
+         try {
+            const usuario = jwt.verify(token, process.env.SECRET);
+            return {
+               usuario,
+            };
+         } catch (error) {
+            console.log("Error en TokenIndex:", error);
+         }
+      }
+   },
 });
 
 // --- Iniciar el servidor: ---

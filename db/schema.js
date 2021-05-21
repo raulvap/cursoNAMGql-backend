@@ -10,6 +10,7 @@ const { gql } = require("apollo-server");
 // FORMA: TYPE, INPUT, QUERY MUTATION
 
 const typeDefs = gql`
+   # --------- TYPES: ---------
    type Usuario {
       id: ID
       nombre: String
@@ -32,6 +33,17 @@ const typeDefs = gql`
       creado: String
    }
 
+   type Cliente {
+      id: ID
+      nombre: String
+      apellido: String
+      empresa: String
+      email: String
+      telefono: String
+      vendedor: ID
+   }
+
+   # --------- INPUTS: ---------
    # definimos los inputs que va a mandar el usuario: (con ! se hacen obligatorios)
    input UsuarioInput {
       nombre: String!
@@ -52,6 +64,15 @@ const typeDefs = gql`
       precio: Float!
    }
 
+   input ClienteInput {
+      nombre: String!
+      apellido: String!
+      empresa: String!
+      email: String!
+      telefono: String
+   }
+
+   # --------- QUERYS: ---------
    type Query {
       # función : lo que nos regresa (tipado), después definimos igualmente el resolver
       obtenerUsuario(token: String): Usuario
@@ -59,8 +80,14 @@ const typeDefs = gql`
       #Productos: (lesson 34)
       obtenerProductos: [Producto]
       obtenerProducto(id: ID!): Producto
+
+      #Clientes (Lesson 42, 43, 44)
+      obtenerClientes: [Cliente]
+      obtenerClientesVendedor: [Cliente]
+      obtenerCliente(id: ID!): Cliente
    }
 
+   # --------- MUTATIONS: ---------
    type Mutation {
       # USUARIOS
       # creamos el mutation con el input que creamos arriba:
@@ -74,6 +101,11 @@ const typeDefs = gql`
       nuevoProducto(input: ProductoInput): Producto
       actualizarProducto(id: ID!, input: ProductoInput): Producto
       eliminarProducto(id: ID!): String
+
+      # CLIENTES (sección 10)
+      nuevoCliente(input: ClienteInput): Cliente
+      actualizarCliente(id: ID!, input: ClienteInput): Cliente
+      eliminarCliente(id: ID!): String
    }
 `;
 

@@ -1,6 +1,7 @@
 // --- Importamos el Modelo y más importaciones
 const Usuario = require("../models/Usuario");
 const Producto = require("../models/Producto");
+const Cliente = require("../models/Cliente");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -40,9 +41,46 @@ const resolvers = {
          }
          return producto;
       },
+
+      // Clientes (lesson 42)
+      obtenerClientes: async () => {
+         try {
+            const clientes = await Cliente.find({});
+            return clientes;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+
+      obtenerClientesVendedor: async (_, {}, ctx) => {
+         //Lesson 43: solo regresamos los clientes del vendedor
+         try {
+            const clientes = await Cliente.find({ vendedor: ctx.usuario.id.toString() });
+            return clientes;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+
+      obtenerCliente: async (_, { id }, ctx) => {
+         //Lesson 44
+         // revisar si el producto con el id existe en la DB:
+         const cliente = await Cliente.findById(id);
+
+         if (!cliente) {
+            throw new Error("Cliente no encontrado (err:c1)");
+         }
+
+         // Quien crea al cliente, puede verlo solamente
+         if (cliente.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Cliente pertenece a otro usuario (err:c2)");
+         }
+         return cliente;
+      },
    },
 
    Mutation: {
+      // --------USUARIOS ---------:
       nuevoUsuario: async (_, { input }) => {
          // destructuring (sacamos) email y password:
          const { email, password } = input;
@@ -84,11 +122,11 @@ const resolvers = {
 
          // Crear el Token: lesson 29
          return {
-            token: crearToken(existeUsuario, process.env.SECRET, "24h"),
+            token: crearToken(existeUsuario, process.env.SECRET, "2d"),
          };
       },
 
-      // Para productos: (lesson 33)
+      // --------PRODUCTOS ---------: (lesson 33)
       nuevoProducto: async (_, { input }) => {
          try {
             const producto = new Producto(input);
@@ -121,12 +159,75 @@ const resolvers = {
          let producto = await Producto.findById(id);
 
          if (!producto) {
-            throw new Error("Producto no encontrado (err:p1");
+            throw new Error("Producto no encontrado (err:p1)");
          }
 
          //Eliminar:
          await Producto.findOneAndDelete({ _id: id });
          return "Producto eliminado";
+      },
+
+      // -------- CLIENTES ---------: (lesson 40)
+      nuevoCliente: async (_, { input }, ctx) => {
+         const { email } = input;
+         const cliente = new Cliente(input);
+
+         // Verificar si el cliente ya está registrado
+         const clienteExiste = await Cliente.findOne({ email });
+
+         if (clienteExiste) {
+            throw new Error("El cliente ya está registrado");
+         }
+
+         // Asignar el vendedor (lesson 41: el id viene el ctx)
+         cliente.vendedor = ctx.usuario.id;
+
+         // Guardarlo en la base de datos
+         try {
+            const resultado = await cliente.save();
+            return resultado;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+
+      actualizarCliente: async (_, { id, input }, ctx) => {
+         // Lesson 45:
+         const { email } = input;
+
+         // verificar si existe o no
+         let cliente = await Cliente.findById(id);
+         if (!cliente) {
+            throw new Error("Cliente no encontrado (err:c1");
+         }
+
+         // Verificar si el vendedor es quién edita:
+         if (cliente.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Cliente pertenece a otro usuario (err:c2)");
+         }
+
+         // Guardar el cliente actualizado
+         cliente = await Cliente.findByIdAndUpdate({ _id: id }, input, { new: true });
+         return cliente;
+      },
+
+      eliminarCliente: async (_, { id }, ctx) => {
+         //Lesson 46
+         // revisar si el cliente existe en la db
+         let cliente = await Cliente.findById(id);
+
+         if (!cliente) {
+            throw new Error("Cliente no encontrado (err:c1)");
+         }
+
+         // Verificar si el vendedor es quién elimina:
+         if (cliente.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Cliente pertenece a otro usuario (err:c2)");
+         }
+
+         //Eliminar:
+         await Cliente.findOneAndDelete({ _id: id });
+         return "Cliente eliminado";
       },
    },
 };
