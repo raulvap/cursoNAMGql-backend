@@ -24,7 +24,7 @@ const typeDefs = gql`
       token: String
    }
 
-   # Type: es cómo nos va a regresar la consulta de producto: (lesson 32 )
+   # Type: es cómo nos va a regresar la consulta de los query's: (lesson 32 )
    type Producto {
       id: ID
       nombre: String
@@ -41,6 +41,25 @@ const typeDefs = gql`
       email: String
       telefono: String
       vendedor: ID
+   }
+
+   type Pedido {
+      # Lesson 48
+      id: ID
+      pedido: [PedidoGrupo]
+      total: Float
+      cliente: ID
+      vendedor: ID
+      fecha: String
+      estado: EstadoPedido
+   }
+
+   type PedidoGrupo {
+      # definimos qué info va dentro del array de cada pedido:
+      id: ID
+      cantidad: Int
+      nombre: String
+      precio: Float
    }
 
    # --------- INPUTS: ---------
@@ -72,19 +91,49 @@ const typeDefs = gql`
       telefono: String
    }
 
+   input PedidoProductoInput {
+      # Lesson 48: en el modelo, pedido es un array, por lo que en el schema lo definimos con el tipo de información que va dentro de ese array
+      # este tipo de input, lo usamos más abajo
+      id: ID
+      cantidad: Int
+      nombre: String
+      precio: Float
+   }
+
+   input PedidoInput {
+      # Lesson 48: el pedido es un arreglo, definido más arriba:
+      pedido: [PedidoProductoInput]
+      total: Float
+      cliente: ID
+      estado: EstadoPedido
+   }
+
+   enum EstadoPedido {
+      # Lesson 48: del input PedidoInput, solo estos 3 strings se le pueden asignar a estado:
+      PENDIENTE
+      COMPLETADO
+      CANCELADO
+   }
+
    # --------- QUERYS: ---------
    type Query {
       # función : lo que nos regresa (tipado), después definimos igualmente el resolver
       obtenerUsuario(token: String): Usuario
 
-      #Productos: (lesson 34)
+      # PRODUCTOS (lesson 34)
       obtenerProductos: [Producto]
       obtenerProducto(id: ID!): Producto
 
-      #Clientes (Lesson 42, 43, 44)
+      # CLIENTES (Lesson 42, 43, 44)
       obtenerClientes: [Cliente]
       obtenerClientesVendedor: [Cliente]
       obtenerCliente(id: ID!): Cliente
+
+      # PEDIDOS: (lesson 52, 53, 54, 57)
+      obtenerPedidos: [Pedido]
+      obtenerPedidosVendedor: [Pedido]
+      obtenerPedido(id: ID!): Pedido
+      obtenerPedidosEstado(estado: String!): [Pedido]
    }
 
    # --------- MUTATIONS: ---------
@@ -106,6 +155,11 @@ const typeDefs = gql`
       nuevoCliente(input: ClienteInput): Cliente
       actualizarCliente(id: ID!, input: ClienteInput): Cliente
       eliminarCliente(id: ID!): String
+
+      # PEDIDOS (sección 11)
+      nuevoPedido(input: PedidoInput): Pedido
+      actualizarPedido(id: ID!, input: PedidoInput): Pedido
+      eliminarPedido(id: ID!): String
    }
 `;
 

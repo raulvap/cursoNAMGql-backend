@@ -8,3 +8,6 @@
 
 // err c1: cliente no existe en la base de datos
 // err c2: el usuario que está intentando acceder al cliente no le pertenece
+
+// err e1: pedido no existe en la base de datos
+// err e2: el usuario que está intentando acceder al pedido no le pertenece

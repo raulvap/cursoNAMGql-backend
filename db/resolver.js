@@ -2,6 +2,8 @@
 const Usuario = require("../models/Usuario");
 const Producto = require("../models/Producto");
 const Cliente = require("../models/Cliente");
+const Pedido = require("../models/Pedidos");
+
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -16,14 +18,14 @@ const crearToken = (usuario, secret, expiresIn) => {
 // --- RESOLVERS ---
 const resolvers = {
    Query: {
-      // Usuarios:
+      // ----------- Usuarios: -----------
       obtenerUsuario: async (_, { token }) => {
          const usuarioId = await jwt.verify(token, process.env.SECRET);
 
          return usuarioId;
       },
 
-      // Productos (lesson 34)
+      // ----------- Productos (lesson 34) -----------
       obtenerProductos: async () => {
          try {
             const productos = await Producto.find({});
@@ -42,7 +44,7 @@ const resolvers = {
          return producto;
       },
 
-      // Clientes (lesson 42)
+      // ----------- Clientes (lesson 42) -----------
       obtenerClientes: async () => {
          try {
             const clientes = await Cliente.find({});
@@ -76,6 +78,53 @@ const resolvers = {
             throw new Error("Cliente pertenece a otro usuario (err:c2)");
          }
          return cliente;
+      },
+
+      // ----------- PEDIDOS: -----------
+      obtenerPedidos: async () => {
+         // Lesson 53
+         try {
+            const pedidos = await Pedido.find({});
+            return pedidos;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+      obtenerPedidosVendedor: async (_, {}, ctx) => {
+         // Lesson 53
+         try {
+            const pedidos = await Pedido.find({ vendedor: ctx.usuario.id });
+            return pedidos;
+         } catch (error) {
+            console.log(error);
+         }
+      },
+      obtenerPedido: async (_, { id }, ctx) => {
+         // Lesson 54
+
+         //Verificar si el pediso existe
+         const pedido = await Pedido.findById(id);
+         if (!pedido) {
+            throw new Error("Pedido no encontrado (err: e1)");
+         }
+
+         // Solo quien lo creo puede verlo
+         if (pedido.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Cliente pertenece a otro usuario (err:e2)");
+         }
+
+         // regresar el resultado.
+         return pedido;
+      },
+      obtenerPedidosEstado: async (_, { estado }, ctx) => {
+         // Lesson 57
+         // Revisamos el vendedor y el estado:
+         const pedidos = await Pedido.find({
+            vendedor: ctx.usuario.id,
+            estado: estado,
+         });
+
+         return pedidos;
       },
    },
 
@@ -228,6 +277,115 @@ const resolvers = {
          //Eliminar:
          await Cliente.findOneAndDelete({ _id: id });
          return "Cliente eliminado";
+      },
+
+      // -------- PEDIDOS ---------: (lesson 49)
+      nuevoPedido: async (_, { input }, ctx) => {
+         // Lesson 49:
+         const { cliente } = input;
+
+         // Verificar si existe o no
+         let clienteExiste = await Cliente.findById(cliente);
+
+         if (!clienteExiste) {
+            throw new Error("Cliente no encontrado (err:c1)");
+         }
+
+         // Verificar si el cliente es del vendedor
+         if (clienteExiste.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Cliente pertenece a otro usuario (err:c2)");
+         }
+
+         // Revisar que haya stock disponible
+         // Lesson 50:
+         for await (const articulo of input.pedido) {
+            const { id } = articulo;
+            const producto = await Producto.findById(id);
+
+            if (articulo.cantidad > producto.existencia) {
+               throw new Error(`El artículo ${producto.nombre} excede la cantidad disponible`);
+            } else {
+               // Lesson 51:
+               // Restar la cantidad del pedido a lo que está disponible
+               producto.existencia = producto.existencia - articulo.cantidad;
+               await producto.save();
+            }
+         }
+
+         //Crear un nuevo pedido:
+         // Lesson 51:
+         const nuevoPedido = new Pedido(input);
+
+         // Asignarle un vendedor
+         nuevoPedido.vendedor = ctx.usuario.id;
+
+         // Guardarlo en la DB
+         const resultado = await nuevoPedido.save();
+         return resultado;
+      },
+      actualizarPedido: async (_, { id, input }, ctx) => {
+         //Lesson 55
+         const { cliente } = input;
+         // Revisar si el pedido existe
+         const existePedido = await Pedido.findById(id);
+         if (!existePedido) {
+            throw new Error("Pedido no encontrado (err: e1)");
+         }
+
+         // Revisar si el cliente existe
+         const existeCliente = await Cliente.findById(id);
+         if (!existeCliente) {
+            throw new Error("Cliente no encontrado (err: c1)");
+         }
+
+         // Revisar si el cliente y el pedido pertenecen al vendedor
+         if (
+            existePedido.vendedor.toString() !== ctx.usuario.id ||
+            existeCliente.vendedor.toString() !== ctx.usuario.id
+         ) {
+            throw new Error("Pedido pertenece a otro usuario (err:e2)");
+         }
+
+         // Revisar el stock
+         if (input.pedido) {
+            for await (const articulo of input.pedido) {
+               const { id } = articulo;
+               const producto = await Producto.findById(id);
+
+               if (articulo.cantidad > producto.existencia) {
+                  throw new Error(`El artículo ${producto.nombre} excede la cantidad disponible`);
+               } else {
+                  // Lesson 51:
+                  // Restar la cantidad del pedido a lo que está disponible
+                  producto.existencia = producto.existencia - articulo.cantidad;
+                  await producto.save();
+               }
+            }
+         }
+
+         // Guardar el pedido
+         const resultado = await Pedido.findOneAndUpdate({ _id: id }, input, { new: true });
+         return resultado;
+      },
+
+      eliminarPedido: async (_, { id }, ctx) => {
+         // Lesson 56
+         // Verificar si el pedido existe
+         const pedido = await Pedido.findById(id);
+         if (!pedido) {
+            throw new Error("Pedido no encontrado (err: e1)");
+         }
+
+         // Verificar si el vendedor es quien lo borra
+         if (pedido.vendedor.toString() !== ctx.usuario.id) {
+            throw new Error("Pedido pertenece a otro usuario (err:e2)");
+         }
+
+         // Actualizar inventario disponible To Do
+
+         // Eliminar el pedido de la base de datos
+         await Pedido.findOneAndDelete({ _id: id });
+         return "Pedido eliminado";
       },
    },
 };
