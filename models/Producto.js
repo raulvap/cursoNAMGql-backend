@@ -22,4 +22,7 @@ const ProductoSchema = mongoose.Schema({
    },
 });
 
+//Lesson 60: creamos un índice para saber cuantos productos hay disponibles:
+ProductoSchema.index({ nombre: "text" });
+
 module.exports = mongoose.model("Producto", ProductoSchema);

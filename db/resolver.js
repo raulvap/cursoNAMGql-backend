@@ -126,6 +126,70 @@ const resolvers = {
 
          return pedidos;
       },
+
+      // ----------- BUSQUEDAS AVANZADAS: -----------
+      mejoresClientes: async () => {
+         // Lesson 58: obteniendo los mejores clientes
+         const clientes = await Pedido.aggregate([
+            { $match: { estado: "COMPLETADO" } },
+            {
+               $group: {
+                  _id: "$cliente",
+                  total: { $sum: "$total" },
+               },
+            },
+            {
+               $lookup: {
+                  from: "clientes",
+                  localField: "_id",
+                  foreignField: "id",
+                  as: "cliente",
+               },
+            },
+            {
+               $limit: 10,
+            },
+            {
+               $sort: { total: -1 },
+            },
+         ]);
+
+         return clientes;
+      },
+      mejoresVendedores: async () => {
+         // Lesson 59: obteniendo los mejores vendedores
+         const vendedores = await Pedido.aggregate([
+            { $match: { estado: "COMPLETADO" } },
+            {
+               $group: {
+                  _id: "$vendedor",
+                  total: { $sum: "$total" },
+               },
+            },
+            {
+               $lookup: {
+                  from: "usuarios",
+                  localField: "_id",
+                  foreignField: "_id",
+                  as: "vendedor",
+               },
+            },
+            {
+               $limit: 10,
+            },
+            {
+               $sort: { total: -1 },
+            },
+         ]);
+         return vendedores;
+      },
+      buscarProducto: async (_, { texto }) => {
+         //Lesson 60: para buscar un producto
+         const productos = await Producto.find({
+            $text: { $search: texto },
+         });
+         return productos;
+      },
    },
 
    Mutation: {

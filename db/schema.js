@@ -62,6 +62,18 @@ const typeDefs = gql`
       precio: Float
    }
 
+   type TopCliente {
+      # Lesson 58: el tipo de TopCliente que vamos a regresar:
+      total: Float
+      cliente: [Cliente]
+   }
+
+   type TopVendedor {
+      # Lesson 59: el tipo de TopVendedor que vamos a regresar:
+      total: Float
+      vendedor: [Usuario]
+   }
+
    # --------- INPUTS: ---------
    # definimos los inputs que va a mandar el usuario: (con ! se hacen obligatorios)
    input UsuarioInput {
@@ -134,6 +146,11 @@ const typeDefs = gql`
       obtenerPedidosVendedor: [Pedido]
       obtenerPedido(id: ID!): Pedido
       obtenerPedidosEstado(estado: String!): [Pedido]
+
+      # BUSQUEDAS AVANZADAS (lesson 58, 59, 60)
+      mejoresClientes: [TopCliente]
+      mejoresVendedores: [TopVendedor]
+      buscarProducto(texto: String!): [Producto]
    }
 
    # --------- MUTATIONS: ---------
