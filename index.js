@@ -17,9 +17,11 @@ const server = new ApolloServer({
    // Lesson 41: usando context para asignarle el vendedor al cliente:
    context: ({ req }) => {
       const token = req.headers["authorization"] || "";
+
       if (token) {
          try {
-            const usuario = jwt.verify(token, process.env.SECRET);
+            const usuario = jwt.verify(token.replace("Bearer ", ""), process.env.SECRET);
+
             return {
                usuario,
             };

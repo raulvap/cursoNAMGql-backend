@@ -130,7 +130,7 @@ const typeDefs = gql`
    # --------- QUERYS: ---------
    type Query {
       # función : lo que nos regresa (tipado), después definimos igualmente el resolver
-      obtenerUsuario(token: String): Usuario
+      obtenerUsuario: Usuario
 
       # PRODUCTOS (lesson 34)
       obtenerProductos: [Producto]
