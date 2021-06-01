@@ -63,8 +63,8 @@ const resolvers = {
       },
 
       obtenerCliente: async (_, { id }, ctx) => {
-         //Lesson 44
-         // revisar si el producto con el id existe en la DB:
+         // Lesson 44:
+         // Revisar si el cliente existe o no
          const cliente = await Cliente.findById(id);
 
          if (!cliente) {
@@ -75,6 +75,7 @@ const resolvers = {
          if (cliente.vendedor.toString() !== ctx.usuario.id) {
             throw new Error("Cliente pertenece a otro usuario (err:c2)");
          }
+
          return cliente;
       },
 
