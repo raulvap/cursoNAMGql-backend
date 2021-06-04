@@ -92,6 +92,7 @@ const resolvers = {
          // Lesson 53
          try {
             const pedidos = await Pedido.find({ vendedor: ctx.usuario.id }).populate("cliente");
+            // Lesson 137: populate hace que se junte con otro modelo
 
             // console.log(pedidos);
             return pedidos;
@@ -390,6 +391,7 @@ const resolvers = {
       actualizarPedido: async (_, { id, input }, ctx) => {
          //Lesson 55
          const { cliente } = input;
+
          // Revisar si el pedido existe
          const existePedido = await Pedido.findById(id);
          if (!existePedido) {
@@ -397,7 +399,7 @@ const resolvers = {
          }
 
          // Revisar si el cliente existe
-         const existeCliente = await Cliente.findById(id);
+         const existeCliente = await Cliente.findById(cliente);
          if (!existeCliente) {
             throw new Error("Cliente no encontrado (err: c1)");
          }

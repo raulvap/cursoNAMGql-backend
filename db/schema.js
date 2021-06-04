@@ -44,7 +44,7 @@ const typeDefs = gql`
    }
 
    type Pedido {
-      # Lesson 48
+      # Lesson 48 y 137: cambiamos en cliente: ID por Cliente, ya que nos regresa el type Cliente
       id: ID
       pedido: [PedidoGrupo]
       total: Float
