@@ -10,7 +10,6 @@ const jwt = require("jsonwebtoken");
 //función de creación de Token: (Lesson 29: npm i jsonwebtoken)
 const crearToken = (usuario, secret, expiresIn) => {
    const { id, email, nombre, apellido } = usuario;
-
    return jwt.sign({ id, email, nombre, apellido }, secret, { expiresIn });
 };
 
@@ -92,7 +91,9 @@ const resolvers = {
       obtenerPedidosVendedor: async (_, {}, ctx) => {
          // Lesson 53
          try {
-            const pedidos = await Pedido.find({ vendedor: ctx.usuario.id });
+            const pedidos = await Pedido.find({ vendedor: ctx.usuario.id }).populate("cliente");
+
+            // console.log(pedidos);
             return pedidos;
          } catch (error) {
             console.log(error);

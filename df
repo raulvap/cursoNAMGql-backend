@@ -1,0 +1,47 @@
+[33mcommit c3b4a9317d02588326bd756b792a9fb88c1a21d0[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Tue Jun 1 08:19:58 2021 -0500
+
+    Seccion 18, edicion de clientes
+
+[33mcommit 665454e76e36144d9709c88472fb141353a5b8fb[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Fri May 28 08:48:02 2021 -0500
+
+    Seccion 16 terminada, creacion de clientes, cerrar sesion
+
+[33mcommit c66b00cb7885ce077c862511bc8b9b4a1788a027[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Wed May 26 07:25:22 2021 -0500
+
+    seccion 14 terminada, búsquedas avanzadas
+
+[33mcommit b93245fb08117d9260751d1c1b705392a03b8fda[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Tue May 25 13:45:51 2021 -0500
+
+    sección 12 terminada, CRUD de Pedidos
+
+[33mcommit 27e85d8896e8aff82458ebc9fa6c161f0c331bf5[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Fri May 21 10:43:43 2021 -0500
+
+    Sección 10 terminada: todo lo de clientes, CRUD
+
+[33mcommit 63b2a290005c180a93cdb508c022bffd57ad2c54[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Thu May 20 07:48:20 2021 -0500
+
+    Sección 9: productos CRUD con schemas y resolvers
+
+[33mcommit 42ab1cf60784dbb39cab05758478c15fb0639482[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Wed May 19 10:49:36 2021 -0500
+
+    users added, seccion 5,6 y 7, todo lo de usuarios
+
+[33mcommit 47cf12ee740d4c98ffb4d29935a4092c7c18706b[m
+Author: Raúl Gerardo Vázquez Perdomo <rvazquezp@axtel.com.mx>
+Date:   Wed May 19 07:18:43 2021 -0500
+
+    Starting course CRM with Next, Apollo, Mongo and GraphQL
