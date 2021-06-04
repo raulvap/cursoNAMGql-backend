@@ -5,11 +5,11 @@ const IP_SERVER = process.env.IP_SERVER;
 const PORT_DB = process.env.PORT_DB;
 
 //Nota: Cambiar DB_DEMO para que sea local o en alguna base de datos en Mongo Atlas
-// const dbConnect = process.env.DB_CLOUD;
-const dbConnect = `mongodb://${IP_SERVER}:${PORT_DB}/cursoCRM`;
+const dbConnect = process.env.DB_CLOUD;
+// const dbConnect = `mongodb://${IP_SERVER}:${PORT_DB}/cursoCRM`;
 
-// const dbPORT = "MongoAtlas";
-const dbPORT = PORT_DB;
+const dbPORT = "MongoAtlas";
+// const dbPORT = PORT_DB;
 
 const conectarDB = async () => {
    try {

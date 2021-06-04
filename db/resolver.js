@@ -143,7 +143,7 @@ const resolvers = {
                $lookup: {
                   from: "clientes",
                   localField: "_id",
-                  foreignField: "id",
+                  foreignField: "_id",
                   as: "cliente",
                },
             },
@@ -157,6 +157,7 @@ const resolvers = {
 
          return clientes;
       },
+
       mejoresVendedores: async () => {
          // Lesson 59: obteniendo los mejores vendedores
          const vendedores = await Pedido.aggregate([
@@ -176,14 +177,16 @@ const resolvers = {
                },
             },
             {
-               $limit: 10,
+               $limit: 3,
             },
             {
                $sort: { total: -1 },
             },
          ]);
+
          return vendedores;
       },
+
       buscarProducto: async (_, { texto }) => {
          //Lesson 60: para buscar un producto
          const productos = await Producto.find({
